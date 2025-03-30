@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "mermaid": "10.8.0",
-    "prismjs": "1.29.0",
-    "react-gist": "1.2.4"
+    "react-gist": "1.2.4",
+    "shiki": "^0.10.1"
   },
   "peerDependencies": {
     "react": "18.2.0",

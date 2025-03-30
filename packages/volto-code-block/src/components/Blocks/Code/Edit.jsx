@@ -5,7 +5,7 @@ import config from '@plone/volto/registry';
 import CodeBlockData from './Data';
 import Caption from '../../Caption/Caption.jsx';
 import Editor from '../../Editor/Editor.tsx';
-import { highlight } from 'prismjs/components/prism-core';
+import { getHighlighter } from 'shiki';
 
 const CodeBlockEdit = (props) => {
   const { data, selected, block, onChangeBlock } = props;
@@ -26,13 +26,18 @@ const CodeBlockEdit = (props) => {
     onChangeBlock(block, { ...data, code: code });
   };
 
+  const highlightCode = async (code) => {
+    const highlighter = await getHighlighter({ theme: data.style });
+    return highlighter.codeToHtml(code, { lang: data.language });
+  };
+
   return (
     <div className="block code">
       <div className={className}>
         <Editor
           value={code}
           onValueChange={(code) => handleChange(code)}
-          highlight={(code) => highlight(code, language)}
+          highlight={(code) => highlightCode(code)}
           padding={10}
           preClassName={`code-block-wrapper ${data.style} language-${data.language}`}
         />

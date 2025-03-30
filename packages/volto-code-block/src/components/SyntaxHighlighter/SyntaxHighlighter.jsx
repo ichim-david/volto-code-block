@@ -1,12 +1,8 @@
-import React, { useEffect } from 'react';
-import Prism from 'prismjs';
+import React, { useEffect, useState } from 'react';
+import { getHighlighter } from 'shiki';
 import config from '@plone/volto/registry';
 
 import cx from 'classnames';
-
-import 'prismjs/plugins/toolbar/prism-toolbar';
-import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
-import 'prismjs/plugins/line-numbers/prism-line-numbers';
 
 const SyntaxHighlighter = (props) => {
   const { language, code, showLineNumbers, lineNbr } = props;
@@ -14,13 +10,26 @@ const SyntaxHighlighter = (props) => {
     'line-numbers': showLineNumbers,
   });
   const allLanguages = config.settings.codeBlock.languages;
+  const [highlighter, setHighlighter] = useState(null);
+
   useEffect(() => {
-    Prism.languages[language] = allLanguages[language].language;
-    Prism.highlightAll();
-  }, [allLanguages, language]);
+    const loadHighlighter = async () => {
+      const highlighter = await getHighlighter({ theme: 'nord' });
+      setHighlighter(highlighter);
+    };
+
+    loadHighlighter();
+  }, []);
+
+  useEffect(() => {
+    if (highlighter) {
+      highlighter.codeToHtml(code, { lang: language });
+    }
+  }, [highlighter, code, language]);
+
   return (
     <pre className={className} data-start={lineNbr}>
-      <code data-prismjs-copy-timeout="300">{code}</code>
+      <code dangerouslySetInnerHTML={{ __html: highlighter ? highlighter.codeToHtml(code, { lang: language }) : code }} />
     </pre>
   );
 };
